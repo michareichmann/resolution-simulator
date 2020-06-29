@@ -30,7 +30,7 @@ telescope::telescope(std::vector<gblsim::plane> planes, double beam_energy, doub
   m_listOfPoints(),
   m_listOfLabels()
 {
-  LOG(logINFO) << "Received " << planes.size() << " planes.";
+  LOG(logDEBUG) << "Received " << planes.size() << " planes.";
 
   // Make sure they are ordered in z by sorting the planes vector:
   std::sort(planes.begin(),planes.end());
