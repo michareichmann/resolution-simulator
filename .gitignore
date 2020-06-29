@@ -2,4 +2,6 @@
 *~
 *.root
 build
+.idea
+cmake*
 
