@@ -63,7 +63,7 @@ void draw_plane_spacing(unsigned n_planes, float dut_distance, float dut_spacing
     g->SetLineColor(2);
     g->Draw("al");
     auto x_ax = g->GetXaxis();
-    x_ax->SetTitle("Plane Spacing [mm]");
+    x_ax->SetTitle("Z_{t} [mm]");
     auto y_ax = g->GetYaxis();
     y_ax->SetTitle("Resolution [#mum]");
     y_ax->SetTitleOffset(1.6);
@@ -105,7 +105,7 @@ void draw_dut_gap(unsigned n_planes, float dut_distance, float spacing, float st
     g->SetLineColor(2);
     g->Draw("al");
     auto x_ax = g->GetXaxis();
-    x_ax->SetTitle("DUT Gap [mm]");
+    x_ax->SetTitle("Z_{d} [mm]");
     auto y_ax = g->GetYaxis();
     y_ax->SetTitle("Resolution [#mum]");
     y_ax->SetTitleOffset(1.6);
