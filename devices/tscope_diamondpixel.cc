@@ -5,6 +5,7 @@
 #include "materials.h"
 #include "constants.h"
 #include "log.h"
+#include "math.h"
 
 using namespace std;
 using namespace gblsim;
@@ -37,38 +38,49 @@ int main(int argc, char* argv[]) {
   
   // Telescope properties:
   double analog_plane = 285e-3 / X0_Si + 500e-3 / X0_Si + 700e-3 / X0_PCB;
-  double diamond_plane = 40e-3 / X0_Au + 1550e-3 / X0_PCB + 40e-3 / X0_Au + 700e-3 / X0_Si + 500e-3 / X0_Diamond + 10e-3 / X0_Au;
-  double digital_plane = 1550e-3 / X0_PCB + 700e-3 / X0_Si + 285e-3 / X0_Si;
+  float angle_fac = sqrt(1 + pow(tan(30 * M_PI / 180), 2) + pow(tan(35 * M_PI / 180), 2));
+  double diamond_plane = (1550e-3 / X0_PCB + 700e-3 / X0_Si + 500e-3 / X0_Diamond) * angle_fac; // + 40e-3 / X0_Au + 40e-3 / X0_Au + 10e-3 / X0_Au;
+  double digital_plane = (1550e-3 / X0_PCB + 700e-3 / X0_Si + 285e-3 / X0_Si) * angle_fac;
 
-  // Beam: 250 MeV Pi at PSI
-  double BEAM = 0.250;
-  
+  // Beam: 200 GeV Pi at CERN
+  double BEAM = 200;
+//  double spacing = 20.32;
+  double spacing = 60;
+
   //----------------------------------------------------------------------------
   // Build the trajectory through the telescope device:
 
-  plane pl0(0,analog_plane,true,resolution_analog);
-  plane pl1(20.32,analog_plane,true,resolution_analog);
-
-  plane diamond1(60.96,diamond_plane,false);
-  plane diamond2(81.28,diamond_plane,false);
-  plane silicon(101.6,digital_plane,true,resolution_digital);
-  //plane silicon(101.6,digital_plane,false);
-    
-  plane pl2(142.24,analog_plane,true,resolution_analog);
-  plane pl3(162.56,analog_plane,true,resolution_analog);
-
   std::vector<plane> planes;
-  planes.push_back(pl0);
-  planes.push_back(pl1);
-  planes.push_back(diamond1);
-  planes.push_back(diamond2);
-  planes.push_back(silicon);
-  planes.push_back(pl2);
-  planes.push_back(pl3);
+  for (int i(0); i < 3; i++)
+    planes.push_back(plane(spacing * i, digital_plane, true, resolution_analog));
+
+  for (int i(6); i < 9; i++)
+    planes.push_back(plane(spacing * i, diamond_plane, false));
+
+  for (int i(12); i < 15; i++)
+    planes.push_back(plane(spacing * i, digital_plane, true, resolution_analog));
 
   telescope mytel(planes, BEAM);
-  LOG(logRESULT) << "Track resolution at Diamond 1: " << mytel.getResolution(2);
-  LOG(logRESULT) << "Track resolution at Diamond 2: " << mytel.getResolution(3);
+
+  LOG(logRESULT) << "Track resolution (X) at Diamond 1: " << mytel.getResolution(3);
+  LOG(logRESULT) << "Track resolution (X) at Diamond 2: " << mytel.getResolution(4);
+  LOG(logRESULT) << "Track resolution (X) at Diamond 3: " << mytel.getResolution(5);
+
+
+  std::vector<plane> yplanes;
+  for (int i(0); i < 3; i++)
+    yplanes.push_back(plane(spacing * i, digital_plane, true, resolution_analog_y));
+
+  for (int i(3); i < 6; i++)
+    yplanes.push_back(plane(spacing * i, diamond_plane, false));
+
+  for (int i(6); i < 9; i++)
+    yplanes.push_back(plane(spacing * i, digital_plane, true, resolution_analog_y));
+
+  telescope ymytel(yplanes, BEAM);
+  LOG(logRESULT) << "Track resolution (Y) at Diamond 1: " << ymytel.getResolution(3);
+  LOG(logRESULT) << "Track resolution (Y) at Diamond 2: " << ymytel.getResolution(4);
+  LOG(logRESULT) << "Track resolution (Y) at Diamond 3: " << ymytel.getResolution(5);
 
   return 0;
 }
